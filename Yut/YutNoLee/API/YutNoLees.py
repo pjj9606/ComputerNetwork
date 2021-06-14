@@ -25,11 +25,6 @@ class YutNoLee():
         self.termintae_flag = False
 
 
-    # 윷 던짐
-    def run_Yut(self):
-        result = random.randInt(1,5)
-        return result
-
     # 말 이동
     def move_Mal(self, num, team):
         a = 1

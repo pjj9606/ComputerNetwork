@@ -198,20 +198,6 @@
         $('#success-toast-container').hide();
         $('#fail-toast-container').hide();
 
-        let timer = setInterval(function(){
-            elapsed_time +=1;
-
-            let seconds = parseInt(elapsed_time%60);
-            let minutes = parseInt((elapsed_time%3600)/60);
-            let hours = parseInt(elapsed_time/3600);
-
-            seconds = seconds.toString().padStart(2, '0');
-            minutes = minutes.toString().padStart(2, '0');
-            hours = hours.toString().padStart(2, '0');
-
-            timer_textbox.innerText = '${hours}:${minutes}:${seconds}';
-        }, 1000);
-
         let button_flexbox = document.querySelector("#throw-btn");
 
         button_flexbox.addEventListener("click", function(){
@@ -289,26 +275,6 @@
             }
         }
 
-        function get_YutNoLee_data() {
-            let data = {'elapsed_time' : elapsed_time,}
-
-            let grid_container = document.querySelector(".gridbox-container");
-            let board = [];
-
-            for(let i=0; i<5; i++){
-                for(let j=0; j<5; j++){
-                    let k = i*5 + j;
-                    let cell = grid_container.children[k];
-                    if(k%9==0){
-                        board.push([])
-                    }
-                    board[i].push(Number(cell.innerText));
-                }
-            }
-            data['puzzle'] = board;
-
-            return data;
-        }
 
         function process_result(response) {
             let status = response.data.status;

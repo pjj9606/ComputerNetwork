@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="http://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="http://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+    <style>
+        <!--css file-->
+        .gridbox-container {
+            display: grid;
+            grid-template-rows: repeat(5,100px);
+            grid-template-columns: repeat(5, 1fr);
+        }
+
+        .gridbox-item {
+            background-color: rgba(255,255,255,0.8);
+            border: 1px solid rgba(0,0,0,1);
+            padding: 1em;
+            font-size : 1em;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .input-item-decorator {
+            color: rgba(136,137,220,1);
+        }
+
+        .fixed-item-decorator {
+            color: rgba(0,0,0,1);
+        }
+
+        .cell-padding-left {
+            margin-left: 0.2em;
+        }
+
+        .cell-padding-bottom {
+            margin-bottom: 0.2em;
+        }
+
+        #main-flexbox{
+            display: flex;
+            flex-flow: column;
+            align-items: center;
+            height: 100%;
+        }
+
+        #content-flexbox{
+            display: flex;
+            flex: 1;
+            width: 50%;
+            flex-flow: row;
+        }
+
+        #dummy-flexbox {
+            display: flex;
+            flex: 1;
+            flex-flow: column;
+            justify-content: center;
+            align-items: center;
+            width : 50$;
+        }
+
+        #sudoku-flexbox {
+            flex: 1;
+            flex-flow: col;
+            height: 100%;
+        }
+
+        #sudoku-flexbox > .gridbox-container{
+            justify-content: center;
+        }
+
+        #button-flexbox {
+            display: flex;
+            flex: 2;
+            flex-flow: column;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+        }
+
+        .btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited, .btn-primary:focus {
+            width: 8em;
+            background-color: rgba(200, 177, 232, 1);
+            border-color: rgba(200, 177, 232, 1);
+        }
+
+        #throw-btn {
+            margin-bottom: 2em;
+        }
+        #main-flexbox{
+            margin-top: 1em;
+        }
+
+        #nav-bar-flexbox{
+            margin-bottom: 1em;
+        }
+
+        #fail-toast{
+            position: relative;
+        }
+        #align-Center{
+            text-align:center;
+        }
+    </style>
+</head>
+<body>
+    <div id="main-flexbox">
+        <div id="nav-bar-flexbox">
+            <h3>YutNoLee~</h3>
+        </div>
+
+        <div id="content-flexbox">
+            <div id="dummy-flexboxA">
+                <div>
+                    <img src="/static/img/playerA.png" style="width:150px; height:150px;" id = "playerA">
+                </div>
+                <div id="userAID" style="text-align:center">userA</div>
+            </div>
+
+            <div id="sudoku-flexboxA">
+                <div class="gridbox-container">
+                </div>
+            </div>
+
+            <div id="dummy-flexboxB">
+                <div>
+                    <img src="/static/img/playerB.png" style="width:150px; height:150px;" id = "playerB">
+                </div>
+                <div id="userBID" style="text-align:center">userB</div>
+            </div>
+
+            <div id="sudoku-flexboxB">
+                <div class="gridbox-container">
+                </div>
+            </div>
+
+            <div id="button-flexbox">
+                <div id="turn" style="text-align:center">Who's turn?</div>
+                <img class="fit-picture"
+                     src="/static/img/images_Yut2.jpg"
+                     alt="윷"
+                     id = "main_Yut">
+                <div>
+                    <input
+                        type="button"
+                        class="btn btn-primary"
+                        onclick="throw_btn_click();"
+                        value="던지기"
+                    />
+                    <input
+                        type="button"
+                        id="throw_res"
+                        class="btn btn-primary"
+                        value="결과값이 여기에 표시됩니다"
+                    />
+                </div>
+
+            </div>
+        </div>
+
+
+    </div>
+
+    <script type="text/javascript">
+        var path = window.location.pathname;
+
+        var flag_turn = true;
+
+        <!--자바스크립트 코드-->
+        <!--사용자 입장-->
+        var inputIDString = prompt('사용할 ID를 입력하세요', 'enter your ID');
+        var userAID = document.getElementById('userAID')
+        var userBID = document.getElementById('userBID')
+
+        <!--default-->
+        if(userAID.innerText = "userA ID"){
+            userAID.innerText = inputIDString;
+        }
+        else if(userBID.innerText = "userB ID"){
+            userBID.innerText = inputIDString;
+        }
+
+
+
+        <!--response 받아와서 make_YutNoLee-->
+        axios.get('/YutNoLee/make')
+        .then(make_YutNoLee);
+
+        let timer_textbox = document.querySelector("#timer-box > h3");
+        var elapsed_time = 0;
+
+        <!--컨테이너 숨기고-->
+        $('#success-toast-container').hide();
+        $('#fail-toast-container').hide();
+
+        let timer = setInterval(function(){
+            elapsed_time +=1;
+
+            let seconds = parseInt(elapsed_time%60);
+            let minutes = parseInt((elapsed_time%3600)/60);
+            let hours = parseInt(elapsed_time/3600);
+
+            seconds = seconds.toString().padStart(2, '0');
+            minutes = minutes.toString().padStart(2, '0');
+            hours = hours.toString().padStart(2, '0');
+
+            timer_textbox.innerText = '${hours}:${minutes}:${seconds}';
+        }, 1000);
+
+        let button_flexbox = document.querySelector("#throw-btn");
+
+        button_flexbox.addEventListener("click", function(){
+            axios.post('/sudoku/check', get_YutNoLee_data()).then(process_result);
+        });
+
+
+        function throw_btn_click() {
+            // 결과값을 박스에 표시하자
+            var resButton = document.getElementById('throw_res');
+            var YutImg = document.getElementById("main_Yut");
+
+            let grid_container;
+            if(flag_turn){
+                grid_container = document.getElementById('sudoku-flexboxA');
+                flag_turn = false;
+                document.getElementById('turn').innerText='B의 차례';
+                userBID.style.color='red';
+                userBID.style.fontWeight="bold"
+                userAID.style.color='black';
+                userAID.style.fontWeight="normal"
+            }
+            else{
+                grid_container = document.getElementById('sudoku-flexboxB');
+                flag_turn = true;
+                document.getElementById('turn').innerText='A의 차례';
+                userBID.style.color='black';
+                userBID.style.fontWeight="normal"
+                userAID.style.color='red';
+                userAID.style.fontWeight="bold"
+            }
+
+            let res = 1 + Math.floor(Math.random()*5);
+
+            /*
+            let cell = grid_container.children[0];
+            cell.innerText="FULL";
+            cell.style.backgroundColor = "yellow";
+            */
+
+            if(res == 1){
+                resButton.value = "도";
+                YutImg.src = "/static/img/Do.png";
+            }
+            else if(res == 2){
+                resButton.value="개";
+                YutImg.src = "/static/img/Ga.png";
+            }
+            else if(res == 3) {
+                resButton.value="걸";
+                YutImg.src = "/static/img/Gul.png";
+            }
+            else if(res == 4) {
+                resButton.value="윷";
+                YutImg.src = "/static/img/Yut.png";
+            }
+            else if(res == 5) {
+                resButton.value="모";
+                YutImg.src = "/static/img/Mo.png";
+            }
+
+            var c = grid_container.children;
+
+            // 왜 1부터해야 들어가지?...
+            for(var i=1; i < c.length; i++){
+                if(c[i].innerText!="Visited"){
+                    for(var j=0; j <res; j++){
+                        if(i+j > 25)       // out of bound
+                            break;
+                        c[i+j].style.backgroundColor = "yellow";
+                        c[i+j].innerText="Visited";
+                    }
+                    break;
+                }
+            }
+        }
+
+        function get_YutNoLee_data() {
+            let data = {'elapsed_time' : elapsed_time,}
+
+            let grid_container = document.querySelector(".gridbox-container");
+            let board = [];
+
+            for(let i=0; i<5; i++){
+                for(let j=0; j<5; j++){
+                    let k = i*5 + j;
+                    let cell = grid_container.children[k];
+                    if(k%9==0){
+                        board.push([])
+                    }
+                    board[i].push(Number(cell.innerText));
+                }
+            }
+            data['puzzle'] = board;
+
+            return data;
+        }
+
+        function process_result(response) {
+            let status = response.data.status;
+            clearInterval(timer);
+
+            if(status == 'clear'){
+                $('#success-toast-container').show();
+                $('#success-toast').toast('show');
+            }else{
+                $('#fail-toast-container').show();
+                $('#fail-toast').toast('show');
+            }
+        }
+
+        function make_YutNoLee(response){
+
+            let grid_containerA = document.getElementById('sudoku-flexboxA');
+            let grid_containerB = document.getElementById('sudoku-flexboxB');
+            let board = response.data.board;
+
+            for(let i=0; i<5; i++){
+                for(let j=0; j<5; j++){
+                    let nodeA = document.createElement("div");
+                    nodeA.classList.add("gridbox-item")
+                    nodeA.classList.add("cell-padding-left");
+                    nodeA.innerText = (i*5+j).toString();
+                    nodeA.classList.add("fixed-item-decorator");
+
+                    let nodeB = document.createElement("div");
+                    nodeB.classList.add("gridbox-item")
+                    nodeB.classList.add("cell-padding-left");
+                    nodeB.innerText = (i*5+j).toString();
+                    nodeB.classList.add("fixed-item-decorator");
+
+                    grid_containerA.appendChild(nodeA);
+                    grid_containerB.appendChild(nodeB);
+                }
+            }
+        }
+
+
+    </script>
+</body>
+</html>

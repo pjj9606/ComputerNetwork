@@ -7,9 +7,10 @@
     <script src="http://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="http://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <title>윷놀이</title>
 
     <style>
-        <!--css file-->
+        /* css file */
         .gridbox-container {
             display: grid;
             grid-template-rows: repeat(5,100px);
@@ -61,7 +62,7 @@
             flex-flow: column;
             justify-content: center;
             align-items: center;
-            width : 50$;
+            width : 50%;
         }
 
         #sudoku-flexbox {
@@ -85,8 +86,8 @@
 
         .btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited, .btn-primary:focus {
             width: 8em;
-            background-color: rgba(200, 177, 232, 1);
-            border-color: rgba(200, 177, 232, 1);
+            background-color: rgba(120,213,247, 1);
+            border-color: rgba(120,213,247, 1);
         }
 
         #throw-btn {
@@ -110,43 +111,53 @@
 </head>
 <body>
     <div id="main-flexbox">
+        <!-- 게임 제목 -->
         <div id="nav-bar-flexbox">
-            <h3>YutNoLee~</h3>
+            <h3>윷을 던져 25칸 먼저 간 사람이 승리!</h3>
         </div>
 
+        <!-- 플레이어 -->
         <div id="content-flexbox">
+
+            <!-- 플레이어A 사진, 이름 -->
             <div id="dummy-flexboxA">
                 <div>
-                    <img src="/static/img/playerA.png" style="width:150px; height:150px;" id = "playerA">
+                    <img src="../../static/img/playerA.png" style="width:150px; height:150px;" id = "playerA"> <!-- 경로 설정을 이렇게 해야 웹에 뜨더라구요 원래 코드는 다 주석처리 해뒀습니다 -->
+                    <!-- <img src="/static/img/playerA.png" style="width:150px; height:150px;" id = "playerA"> -->
                 </div>
                 <div id="userAID" style="text-align:center">userA</div>
             </div>
 
+            <!-- 플레이어A 보드 -->
             <div id="sudoku-flexboxA">
                 <div class="gridbox-container">
                 </div>
             </div>
 
+            <!-- 플레이어B 사진, 이름 -->
             <div id="dummy-flexboxB">
                 <div>
-                    <img src="/static/img/playerB.png" style="width:150px; height:150px;" id = "playerB">
+                    <img src="../../static/img/playerB.png" style="width:150px; height:150px;" id = "playerB">
+                    <!-- <img src="/static/img/playerB.png" style="width:150px; height:150px;" id = "playerB"> -->
                 </div>
                 <div id="userBID" style="text-align:center">userB</div>
             </div>
 
+            <!-- 플레이어B 보드 -->
             <div id="sudoku-flexboxB">
                 <div class="gridbox-container">
                 </div>
             </div>
 
+            <!-- 윷 이미지, 버튼 -->
             <div id="button-flexbox">
-                <div id="turn" style="text-align:center">Who's turn?</div>
-                <img class="fit-picture"
-                     src="/static/img/images_Yut2.jpg"
+                <div id="turn" style="text-align:center; font-weight:bold">Red부터 던집니다</div><br><br>
+                <!-- <img class="fit-picture"
+                     src="../../static/img/images_Yut2.jpg"
                      alt="윷"
-                     id = "main_Yut">
+                     id = "main_Yut"> -->
                 <div>
-                    <input
+                    <!-- <input
                         type="button"
                         class="btn btn-primary"
                         onclick="throw_btn_click();"
@@ -157,7 +168,15 @@
                         id="throw_res"
                         class="btn btn-primary"
                         value="결과값이 여기에 표시됩니다"
-                    />
+                    /> -->
+                    
+                    <!-- 이미지를 버튼으로 만들려고 한건데 통신기능에 문제가 생기면 그냥 위에 있는 원래 코드로 하시면 될 것 같습니다 -->
+                    <!-- 아래 두 줄 지우고 위에 주석 전부 풀면 됩니다 -->
+                    <input type="image" src="../../static/img/images_Yut2.jpg" id = "main_Yut" onclick="throw_btn_click();" />
+                    <br><p id="throw_res" style="text-align:center"></p>
+
+                    <!-- 게임이 끝나면 승자 표시 -->
+                    <br><br><h2 id="winner" style="text-align:center"></p>
                 </div>
 
             </div>
@@ -171,13 +190,13 @@
 
         var flag_turn = true;
 
-        <!--자바스크립트 코드-->
-        <!--사용자 입장-->
+        // 자바스크립트 코드
+        // 사용자 입장
         var inputIDString = prompt('사용할 ID를 입력하세요', 'enter your ID');
         var userAID = document.getElementById('userAID')
         var userBID = document.getElementById('userBID')
 
-        <!--default-->
+        // default
         if(userAID.innerText = "userA ID"){
             userAID.innerText = inputIDString;
         }
@@ -187,14 +206,14 @@
 
 
 
-        <!--response 받아와서 make_YutNoLee-->
+        // response 받아와서 make_YutNoLee
         axios.get('/YutNoLee/make')
         .then(make_YutNoLee);
 
         let timer_textbox = document.querySelector("#timer-box > h3");
         var elapsed_time = 0;
 
-        <!--컨테이너 숨기고-->
+        // 컨테이너 숨기고
         $('#success-toast-container').hide();
         $('#fail-toast-container').hide();
 
@@ -230,33 +249,54 @@
                 userAID.style.fontWeight="bold"
             }
 
-            let res = 1 + Math.floor(Math.random()*5);
 
-            /*
-            let cell = grid_container.children[0];
-            cell.innerText="FULL";
-            cell.style.backgroundColor = "yellow";
-            */
+            // A 차례이면 B의 클릭 막기, B 차례이면 A의 클릭 막기
+            if(document.getElementById('turn').innerText == 'A의 차례'){
+                // B 클릭 x
+                // 클라이언트 2개를 어떻게 처리해야 할지 몰라서 못짰습니다
+                // 혹시라도 구현하기 복잡하면 그냥 삭제하면 될 것 같습니다
+            }
+            else if(document.getElementById('turn').innerText == 'B의 차례'){
+                // A 클릭 x
+                
+            }
+
+
+            let res = 1 + Math.floor(Math.random()*5);
+            
+            // let cell = grid_container.children[0];
+            // cell.innerText="FULL";
+            // cell.style.backgroundColor = "yellow";
 
             if(res == 1){
-                resButton.value = "도";
-                YutImg.src = "/static/img/Do.png";
+                //resButton.value = "도";
+                $('#throw_res').text("도");
+                YutImg.src = "../../static/img/Do.png"; // 경로
+                // YutImg.src = "/static/img/Do.png";
             }
             else if(res == 2){
-                resButton.value="개";
-                YutImg.src = "/static/img/Ga.png";
+                // resButton.value="개";
+                $('#throw_res').text("개");
+                YutImg.src = "../../static/img/Ga.png";
+                // YutImg.src = "/static/img/Ga.png";
             }
             else if(res == 3) {
-                resButton.value="걸";
-                YutImg.src = "/static/img/Gul.png";
+                // resButton.value="걸";
+                $('#throw_res').text("걸");
+                YutImg.src = "../../static/img/Gul.png";
+                // YutImg.src = "/static/img/Gul.png";
             }
             else if(res == 4) {
-                resButton.value="윷";
-                YutImg.src = "/static/img/Yut.png";
+                // resButton.value="윷";
+                $('#throw_res').text("윷");
+                YutImg.src = "../../static/img/Yut.png";
+                // YutImg.src = "/static/img/Yut.png";
             }
             else if(res == 5) {
-                resButton.value="모";
-                YutImg.src = "/static/img/Mo.png";
+                // resButton.value="모";
+                $('#throw_res').text("모");
+                YutImg.src = "../../static/img/Mo.png";
+                // YutImg.src = "/static/img/Mo.png";
             }
 
             var c = grid_container.children;
@@ -265,9 +305,34 @@
             for(var i=1; i < c.length; i++){
                 if(c[i].innerText!="Visited"){
                     for(var j=0; j <res; j++){
-                        if(i+j > 25)       // out of bound
+                        if(i+j > 25){ // out of bound
+
+                            // ** 버튼 비활성화, 승자 이름 띄우는 기능 **
+                            YutImg.onclick = function(){ // 저는 서버? 통신이 안돼서 테스트를 못해봤는데 안되면 코드 수정/추가 부탁드립니다
+                                this.disabled=true;
+                            }
+
+                            if(document.getElementById('turn').innerText == 'A의 차례'){
+                                // 승자 = B
+                                $('#winner').text("승자 : " + userBID);
+                            }
+                            else if(document.getElementById('turn').innerText == 'B의 차례'){
+                                // 승자 = A
+                                $('#winner').text("승자 : " + userAID);
+                            }
                             break;
-                        c[i+j].style.backgroundColor = "yellow";
+                        }
+
+                        if(document.getElementById('turn').innerText == 'A의 차례'){
+                            // B 캐릭터 색으로 칠함 -> 파란색
+                            c[i+j].style.backgroundColor = "blue";
+                        }
+                        else if(document.getElementById('turn').innerText == 'B의 차례'){
+                            // A 캐릭터 색으로 칠함 -> 빨간색
+                            c[i+j].style.backgroundColor = "red";
+                        }
+                            
+                        // c[i+j].style.backgroundColor = "yellow";
                         c[i+j].innerText="Visited";
                     }
                     break;

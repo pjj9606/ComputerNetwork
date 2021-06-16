@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
 from pathlib import Path
+from channels.routing import ProtocolTypeRouter
+from django.core.asgi import get_asgi_application
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,6 +33,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -39,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'YutNoLee.apps.YutNoLeeConfig',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -49,6 +53,17 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+ASGI_APPLICATION = 'Yut.routing.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 ROOT_URLCONF = 'Yut.urls'
 
@@ -68,8 +83,11 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'Yut.wsgi.application'
 
+
+application = ProtocolTypeRouter({
+    "http" : get_asgi_application(),
+})
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases

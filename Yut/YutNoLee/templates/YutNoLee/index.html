@@ -109,16 +109,14 @@
         }
     </style>
 </head>
-<body>
+<body onload="getIDFromPrompt();">
     <div id="main-flexbox">
         <!-- 게임 제목 -->
         <div id="nav-bar-flexbox">
             <h3>윷을 던져 25칸 먼저 간 사람이 승리!</h3>
         </div>
-
         <!-- 플레이어 -->
         <div id="content-flexbox">
-
             <!-- 플레이어A 사진, 이름 -->
             <div id="dummy-flexboxA">
                 <div>
@@ -169,53 +167,122 @@
                         class="btn btn-primary"
                         value="결과값이 여기에 표시됩니다"
                     /> -->
-                    
+
                     <!-- 이미지를 버튼으로 만들려고 한건데 통신기능에 문제가 생기면 그냥 위에 있는 원래 코드로 하시면 될 것 같습니다 -->
                     <!-- 아래 두 줄 지우고 위에 주석 전부 풀면 됩니다 -->
                     <input type="image" src="../../static/img/images_Yut2.jpg" id = "main_Yut" onclick="throw_btn_click();" />
                     <br><p id="throw_res" style="text-align:center"></p>
 
                     <!-- 게임이 끝나면 승자 표시 -->
-                    <br><br><h2 id="winner" style="text-align:center"></p>
+                    <br><br><h2 id="winner" style="text-align:center"></h2></p>
                 </div>
-
             </div>
+
+            <div id="chat-flexbox">
+                <!--채팅창-->
+                <textarea id="chat-log" cols="100" rows="20"></textarea><br>
+                <input id="chat-message-input" type="text" size="100"><br>
+                <input id="chat-message-submit" type="button" value="Send">
+                {{ room_name|json_script:"room-name" }}
+            </div>
+
         </div>
 
 
     </div>
 
     <script type="text/javascript">
+
+
+        // 채팅 관련 코드
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+
+        const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/chat/'
+            + roomName
+            + '/'
+        );
+
+        const YutSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/chat/'
+            + roomName
+            + '/'
+        );
+
+        const IDSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/chat/'
+            + roomName
+            + '/'
+        );
+
+        // 메세지 수신
+        chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            if(data.message != undefined)
+                document.querySelector('#chat-log').value += (data.message + '\n');
+            if(data.result != undefined){
+                if(flag_turn)
+                    document.querySelector('#chat-log').value += "빨강의 이동 칸:";
+                else if(!flag_turn)
+                    document.querySelector('#chat-log').value += "파랑의 이동 칸:";
+                document.querySelector('#chat-log').value += (data.result + '\n');
+                change_YutImg(data.result);
+                fill_table(data.result);
+            }
+            /*
+            if(data.ID != undefined){
+                document.querySelector('#chat-log').value += (data.ID + '\n');
+                setID(data.ID);
+            }*/
+        };
+
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        document.querySelector('#chat-message-input').focus();
+        document.querySelector('#chat-message-input').onkeyup = function(e) {
+            if (e.keyCode === 13) {  // enter, return
+                document.querySelector('#chat-message-submit').click();
+            }
+        };
+
+        document.querySelector('#chat-message-submit').onclick = function(e) {
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = messageInputDom.value;
+            chatSocket.send(JSON.stringify({
+                'message': message
+            }));
+            messageInputDom.value = '';
+        };
+
+        // 윷놀이 버튼이 눌리면 메세지 전송
+        document.querySelector('#main_Yut').onclick = function(e) {
+            let result = 1 + Math.floor(Math.random()*5);
+
+            YutSocket.send(JSON.stringify({
+                'result': result
+            }));
+        }
+
+
+
         var path = window.location.pathname;
 
         var flag_turn = true;
+        var flag_setID = false;
 
         // 자바스크립트 코드
-        // 사용자 입장
-        var inputIDString = prompt('사용할 ID를 입력하세요', 'enter your ID');
-        var userAID = document.getElementById('userAID')
-        var userBID = document.getElementById('userBID')
-
-        // default
-        if(userAID.innerText = "userA ID"){
-            userAID.innerText = inputIDString;
-        }
-        else if(userBID.innerText = "userB ID"){
-            userBID.innerText = inputIDString;
-        }
-
-
-
         // response 받아와서 make_YutNoLee
         axios.get('/YutNoLee/make')
         .then(make_YutNoLee);
 
-        let timer_textbox = document.querySelector("#timer-box > h3");
-        var elapsed_time = 0;
-
-        // 컨테이너 숨기고
-        $('#success-toast-container').hide();
-        $('#fail-toast-container').hide();
 
         let button_flexbox = document.querySelector("#throw-btn");
 
@@ -224,12 +291,34 @@
         });
 
 
-        function throw_btn_click() {
-            // 결과값을 박스에 표시하자
-            var resButton = document.getElementById('throw_res');
-            var YutImg = document.getElementById("main_Yut");
+        /*
+        function getIDFromPrompt(){
+            // 사용자 입장
+            var inputIDString = prompt('사용할 ID를 입력하세요', 'enter your ID');
+            setID(inputIDString);z
+            IDSocket.send(JSON.stringify({
+                        'ID': inputIDString
+                    }));
+        }
+        */
+        function setID(ID){
+            var userAID = document.getElementById('userAID');
+            var userBID = document.getElementById('userBID');
 
-            let grid_container;
+
+            // default
+            if(userAID.innerText = "userA ID"){
+                userAID.innerText = ID;
+            }
+            else if(userBID.innerText = "userB ID"){
+                userBID.innerText = ID;
+            }
+        }
+
+        // turn에 따른 gridcontainer 반환, flag 전환
+        function getContainerByFlag(){
+            var grid_container;
+
             if(flag_turn){
                 grid_container = document.getElementById('sudoku-flexboxA');
                 flag_turn = false;
@@ -249,7 +338,6 @@
                 userAID.style.fontWeight="bold"
             }
 
-
             // A 차례이면 B의 클릭 막기, B 차례이면 A의 클릭 막기
             if(document.getElementById('turn').innerText == 'A의 차례'){
                 // B 클릭 x
@@ -258,47 +346,14 @@
             }
             else if(document.getElementById('turn').innerText == 'B의 차례'){
                 // A 클릭 x
-                
-            }
 
+            }
+            return grid_container;
+        }
 
-            let res = 1 + Math.floor(Math.random()*5);
-            
-            // let cell = grid_container.children[0];
-            // cell.innerText="FULL";
-            // cell.style.backgroundColor = "yellow";
-
-            if(res == 1){
-                //resButton.value = "도";
-                $('#throw_res').text("도");
-                YutImg.src = "../../static/img/Do.png"; // 경로
-                // YutImg.src = "/static/img/Do.png";
-            }
-            else if(res == 2){
-                // resButton.value="개";
-                $('#throw_res').text("개");
-                YutImg.src = "../../static/img/Ga.png";
-                // YutImg.src = "/static/img/Ga.png";
-            }
-            else if(res == 3) {
-                // resButton.value="걸";
-                $('#throw_res').text("걸");
-                YutImg.src = "../../static/img/Gul.png";
-                // YutImg.src = "/static/img/Gul.png";
-            }
-            else if(res == 4) {
-                // resButton.value="윷";
-                $('#throw_res').text("윷");
-                YutImg.src = "../../static/img/Yut.png";
-                // YutImg.src = "/static/img/Yut.png";
-            }
-            else if(res == 5) {
-                // resButton.value="모";
-                $('#throw_res').text("모");
-                YutImg.src = "../../static/img/Mo.png";
-                // YutImg.src = "/static/img/Mo.png";
-            }
-
+        // 칸을 채워주는 함수
+        function fill_table(res){
+            var grid_container = getContainerByFlag();
             var c = grid_container.children;
 
             // 왜 1부터해야 들어가지?...
@@ -331,7 +386,81 @@
                             // A 캐릭터 색으로 칠함 -> 빨간색
                             c[i+j].style.backgroundColor = "red";
                         }
-                            
+
+                        // c[i+j].style.backgroundColor = "yellow";
+                        c[i+j].innerText="Visited";
+                    }
+                    break;
+                }
+            }
+        }
+
+
+
+
+        // 윷 이미지 변경함수
+        function change_YutImg(res) {
+            if(res == 1){
+                $('#throw_res').text("도");
+                document.getElementById('main_Yut').src = "../../static/img/Do.png"; // 경로
+            }
+            else if(res == 2){
+                $('#throw_res').text("개");
+                document.getElementById('main_Yut').src = "../../static/img/Ga.png";
+            }
+            else if(res == 3) {
+                $('#throw_res').text("걸");
+                document.getElementById('main_Yut').src = "../../static/img/Gul.png";
+            }
+            else if(res == 4) {
+                $('#throw_res').text("윷");
+                document.getElementById('main_Yut').src = "../../static/img/Yut.png";
+            }
+            else if(res == 5) {
+                $('#throw_res').text("모");
+                document.getElementById('main_Yut').src = "../../static/img/Mo.png";
+            }
+        }
+
+
+
+        // 매개변수 없이는 그냥 html에 연결하여 클릭시 난수발생
+        function throw_btn_click() {
+
+            let c = getContainerByFlag();
+
+
+            // 왜 1부터해야 들어가지?...
+            for(var i=1; i < c.length; i++){
+                if(c[i].innerText!="Visited"){
+                    for(var j=0; j <res; j++){
+                        if(i+j > 25){ // out of bound
+
+                            // ** 버튼 비활성화, 승자 이름 띄우는 기능 **
+                            YutImg.onclick = function(){ // 저는 서버? 통신이 안돼서 테스트를 못해봤는데 안되면 코드 수정/추가 부탁드립니다
+                                this.disabled=true;
+                            }
+
+                            if(document.getElementById('turn').innerText == 'A의 차례'){
+                                // 승자 = B
+                                $('#winner').text("승자 : " + userBID);
+                            }
+                            else if(document.getElementById('turn').innerText == 'B의 차례'){
+                                // 승자 = A
+                                $('#winner').text("승자 : " + userAID);
+                            }
+                            break;
+                        }
+
+                        if(document.getElementById('turn').innerText == 'A의 차례'){
+                            // B 캐릭터 색으로 칠함 -> 파란색
+                            c[i+j].style.backgroundColor = "blue";
+                        }
+                        else if(document.getElementById('turn').innerText == 'B의 차례'){
+                            // A 캐릭터 색으로 칠함 -> 빨간색
+                            c[i+j].style.backgroundColor = "red";
+                        }
+
                         // c[i+j].style.backgroundColor = "yellow";
                         c[i+j].innerText="Visited";
                     }

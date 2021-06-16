@@ -5,11 +5,9 @@ from. import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('ranking', views.ranking, name='ranking'),
-    path('YutNoLee/ranking/register', views.register_ranking, name='register_ranking'),
-    path('YutNoLee/ranking', views.get_ranking_list, name='get_ranking_list'),
-    path('YutNoLee/check', views.check_YutNoLee, name='check_YutNoLee'),
-    path('YutNoLee/make', views.make_YutNoLee, name='make_YutNoLee')
+    path('chat/', views.index_tmp, name='index_tmp'),
+    path('YutNoLee/make', views.make_YutNoLee, name='make_YutNoLee'),
+    path('<str:room_name>/', views.room, name='room'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

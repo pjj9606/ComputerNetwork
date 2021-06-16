@@ -9,7 +9,11 @@ from django.views import templates
 import datetime
 import json
 
-@csrf_exempt
+
+def index_tmp(request):
+    return render(request, 'YutNoLee/index_tmp.html')
+
+#@csrf_exempt
 def index(request):
     context = {}
     return render(request, 'YutNoLee/index.html', context)
@@ -29,3 +33,10 @@ def make_YutNoLee(request):
         'board' : board
     }
     return JsonResponse(result)
+
+# 코드 추가
+def room(request, room_name):
+    return render(request, 'YutNoLee/index.html', {
+        'room_name': room_name
+    })
+
